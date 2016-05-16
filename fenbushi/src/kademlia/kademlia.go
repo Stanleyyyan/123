@@ -22,7 +22,7 @@ func main() {
 	// TODO: PUT YOUR GROUP'S NET IDS HERE!
 	// Example:
 	// netIds := "abc123 def456 ghi789"
-	netIds := ""
+	netIds := "omg049 wzm416 cyu422"
 	if len(netIds) == 0 {
 		log.Fatal("Variable containing group's net IDs is not set!\n")
 	}
@@ -46,13 +46,15 @@ func main() {
 	log.Println("Group: " + netIds + "\n")
 
 	kadem := libkademlia.NewKademlia(listenStr)
+	// go kadem.Handler()
+	// go kadem.HandleStore()
 
 	// Confirm our server is up with a PING request and then exit.
 	// Your code should loop forever, reading instructions from stdin and
 	// printing their results to stdout. See README.txt for more details.
 	hostname, port, err := net.SplitHostPort(firstPeerStr)
-	client, err := rpc.DialHTTPPath("tcp", firstPeerStr,
-		rpc.DefaultRPCPath+hostname+port)
+	fmt.Println(hostname)
+	_, err = rpc.DialHTTPPath("tcp", firstPeerStr, rpc.DefaultRPCPath + port)
 	if err != nil {
 		log.Fatal("DialHTTP: ", err)
 	}
@@ -61,15 +63,16 @@ func main() {
 
 	// This is a sample of what an RPC looks like
 	// TODO: Replace this with a call to your completed DoPing!
-	ping := new(libkademlia.PingMessage)
-	ping.MsgID = libkademlia.NewRandomID()
-	var pong libkademlia.PongMessage
-	err = client.Call("KademliaRPC.Ping", ping, &pong)
-	if err != nil {
-		log.Fatal("Call: ", err)
-	}
-	log.Printf("ping msgID: %s\n", ping.MsgID.AsString())
-	log.Printf("pong msgID: %s\n\n", pong.MsgID.AsString())
+	// ping := new(libkademlia.PingMessage)
+	// ping.MsgID = libkademlia.NewRandomID()
+	// var pong libkademlia.PongMessage
+	// err = client.Call("KademliaRPC.Ping", ping, &pong)
+	// if err != nil {
+	// 	fmt.Println("terminal")
+	// 	log.Fatal("Call: ", err)
+	// }
+	// log.Printf("ping msgID: %s\n", ping.MsgID.AsString())
+	// log.Printf("pong msgID: %s\n\n", pong.MsgID.AsString())
 
 	in := bufio.NewReader(os.Stdin)
 	quit := false
@@ -136,7 +139,7 @@ func executeLine(k *libkademlia.Kademlia, line string) (response string) {
 		// Following lines need to be expanded
 		var contact *libkademlia.Contact = nil
 		var err error
-
+		// fmt.Println("Enter Ping!")
 		if len(toks) < 2 || len(toks) > 2 {
 			response = "usage: ping [nodeID | host:port]"
 			return
@@ -294,6 +297,8 @@ func executeLine(k *libkademlia.Kademlia, line string) (response string) {
 		} else if value != nil {
 			response = fmt.Sprintf("OK: Found %s", value)
 		} else {
+			// fmt.Println("find value failed, contact is: ", contacts[0].NodeID.AsString())
+			fmt.Println("contact is: ", contacts[0].NodeID.AsString())
 			response = fmt.Sprintf("OK: Got %d contacts", len(contacts))
 		}
 
@@ -350,6 +355,14 @@ func executeLine(k *libkademlia.Kademlia, line string) (response string) {
 		} else {
 			response = fmt.Sprintf("OK: Found value %s", value)
 		}
+	// case toks[0] == "printRT":
+
+	// 	fmt.Println("Start to print RT :")
+	// 	for i := 0; i < 160; i++ {
+	// 		for _, c1 := range k.K_buckets.buckets[i] {
+	// 			fmt.Println("nodeID is :", c1.NodeID.AsString())
+	// 		}
+	// 	}
 
 	default:
 		response = "ERR: Unknown command"
